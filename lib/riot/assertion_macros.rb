@@ -1,10 +1,12 @@
 module Riot
   class Assertion
-    # Asserts that the result of the test equals the expected value
+    # Asserts that the result of the test equals the expected value. Using the +===+ operator to assert
+    # equality.
     #   asserts("test") { "foo" }.equals("foo")
     #   should("test") { "foo" }.equals("foo")
+    #   asserts("test") { "foo" }.equals { "foo" }
     assertion(:equals) do |actual, expected|
-      expected == actual ? pass : fail("expected #{expected.inspect}, not #{actual.inspect}")
+      expected === actual ? pass : fail("expected #{expected.inspect}, not #{actual.inspect}")
     end
 
     # Asserts that the result of the test is nil
@@ -104,6 +106,14 @@ module Riot
     #   asserts("a hash") { Hash.new }.empty
     assertion(:empty) do |actual|
       actual.length == 0 ? pass : fail("expected #{actual.inspect} to be empty")
+    end
+
+    # Asserts the result contains the expected element
+    #   asserts("a string") { "world" }.includes('o')
+    #   asserts("an array") { [1,2,3] }.includes(2)
+    #   asserts("a range") { (1..15) }.includes(10)
+    assertion(:includes) do |actual, expected|
+      actual.include?(expected) ? pass : fail("expected #{actual.inspect} to include #{expected.inspect}")
     end
 
   end # Assertion

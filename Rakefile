@@ -48,7 +48,7 @@ begin
     gem.email = "gus@gusg.us"
     gem.homepage = "http://github.com/thumblemonks/riot"
     gem.authors = ["Justin 'Gus' Knowlden"]
-    gem.add_dependency 'colorize'
+    gem.add_dependency 'term-ansicolor'
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

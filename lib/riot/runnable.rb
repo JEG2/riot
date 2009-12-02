@@ -1,5 +1,6 @@
 module Riot
   class RunnableBlock
+    attr_reader :definition
     def initialize(description, &definition)
       @description, @definition = description, definition || Proc.new { topic }
     end
@@ -15,7 +16,7 @@ module Riot
     end
 
     def run(situation)
-      situation.setup(&@definition)
+      situation.setup(&definition)
       [:setup]
     end
   end # Setup
@@ -32,8 +33,9 @@ module Riot
     end
 
     def self.assertion(name, expect_exception=false, &assertion_block)
-      define_method(name) do |*expectings|
+      define_method(name) do |*expectings, &expectation_block|
         (class << self; self; end).send(:define_method, :run) do |situation|
+          expectings << situation.evaluate(&expectation_block) if expectation_block
           process_macro(situation, expect_exception) { |actual| assertion_block.call(actual, *expectings) }
         end # redefine run method when the assertion is called
         self
@@ -41,7 +43,7 @@ module Riot
     end
   private
     def process_macro(situation, expect_exception)
-      actual = situation.evaluate(&@definition)
+      actual = situation.evaluate(&definition)
       yield(expect_exception ? nil : actual)
     rescue Exception => e
       expect_exception ? yield(e) : Assertion.error(e)
